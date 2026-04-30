@@ -11,7 +11,8 @@ import LeadDetailView from './components/LeadDetailView';
 import LeadFormModal from './components/LeadFormModal';
 import Auth from './components/Auth';
 import BookingForm from './components/BookingForm';
-import { LayoutDashboard, Calendar, Menu, X, Users, Loader2, LogOut, Trash2, Heart, UserPlus } from 'lucide-react';
+import SettingsView from './components/SettingsView';
+import { LayoutDashboard, Calendar, Menu, X, Users, Loader2, LogOut, Trash2, Heart, UserPlus, Settings } from 'lucide-react';
 import { sessionService } from './services/sessionService';
 import { leadService } from './services/leadService';
 const ClarityIcon = ({ className }: { className?: string }) => (
@@ -31,7 +32,7 @@ const App = () => {
   const [userSession, setUserSession] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'sessions' | 'leads' | 'details' | 'trash' | 'followups' | 'lead-details'>('calendar');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'calendar' | 'sessions' | 'leads' | 'details' | 'trash' | 'followups' | 'lead-details' | 'settings'>('calendar');
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   
@@ -224,6 +225,7 @@ const App = () => {
       case 'sessions': return 'Client List';
       case 'leads': return 'Lead Management';
       case 'followups': return 'Activity Center';
+      case 'settings': return 'Settings';
       case 'trash': return 'Deleted';
       case 'details': return 'Viewing Client';
       case 'lead-details': return 'Viewing Lead';
@@ -264,6 +266,7 @@ const App = () => {
               { id: 'leads', icon: UserPlus, label: 'Leads' },
               { id: 'followups', icon: Heart, label: 'Follow-ups' },
               { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+              { id: 'settings', icon: Settings, label: 'Settings' },
               { id: 'trash', icon: Trash2, label: 'Trash' },
             ].map(tab => (
               <button 
@@ -305,6 +308,8 @@ const App = () => {
                   {activeTab === 'followups' && <FollowUps sessions={sessions} leads={leads} onSessionClick={handleSessionClick} onLeadClick={handleLeadClick} />}
                   
                   {activeTab === 'trash' && <SessionsList sessions={deletedSessions} onSessionClick={handleSessionClick} isTrashView={true} />}
+                  
+                  {activeTab === 'settings' && <SettingsView />}
                   
                   {activeTab === 'details' && selectedSession && <SessionDetailView session={selectedSession} onBack={() => setActiveTab(selectedSession.isDeleted ? 'trash' : 'calendar')} onUpdateSession={handleSaveSession} onEditSession={handleOpenEditBooking} />}
                   
