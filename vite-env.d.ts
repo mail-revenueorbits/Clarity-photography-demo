@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-pwa/client" />
 declare module '*.css';
 declare module '*.png';
 declare module '*.svg' {
