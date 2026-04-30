@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Download } from 'lucide-react';
 
+let globalDeferredPrompt: any = null;
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    globalDeferredPrompt = e;
+    window.dispatchEvent(new Event('pwa-prompt-ready'));
+  });
+}
+
 const SettingsView = () => {
   const [notificationStatus, setNotificationStatus] = useState<string>('');
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(globalDeferredPrompt);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
+    if (globalDeferredPrompt) {
+      setDeferredPrompt(globalDeferredPrompt);
+    }
+
+    const handlePromptReady = () => {
+      setDeferredPrompt(globalDeferredPrompt);
     };
     
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('pwa-prompt-ready', handlePromptReady);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('pwa-prompt-ready', handlePromptReady);
     };
   }, []);
 
@@ -23,6 +36,7 @@ const SettingsView = () => {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
+        globalDeferredPrompt = null;
         setDeferredPrompt(null);
       }
     }
